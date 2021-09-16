@@ -31,7 +31,7 @@ void i2sdacbuiltin_init()
     // I2S_DAC_CHANNEL_LEFT_EN  - Enable I2S built-in DAC left channel, maps to DAC channel 2 on GPIO26
     // I2S_DAC_CHANNEL_BOTH_EN  - Enable both of the I2S built-in DAC channels.
     // I2S_DAC_CHANNEL_MAX      - I2S built-in DAC mode max index
-    i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
+    i2s_set_dac_mode(I2S_DAC_CHANNEL_RIGHT_EN);
 }
 
 void i2sdacbuiltin_deinit()
