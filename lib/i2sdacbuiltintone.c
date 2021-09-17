@@ -1,4 +1,6 @@
 #include <math.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "i2sdacbuiltintone.h"
 
 int16_t toneSamples[I2SDAC_TONE_BUF_LEN];
@@ -21,6 +23,17 @@ void i2sdacbuiltin_init()
     // Set i2s clock for the audio file 16k 16bit, STEREO
     i2s_set_clk(I2SDAC_I2S_NUMBER, I2SDAC_SAMPLE_RATE, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_STEREO);
 
+}
+
+void i2sdacbuiltin_deinit()
+{
+    // Uninstall i2s driver
+    i2s_driver_uninstall(I2SDAC_I2S_NUMBER);
+}
+
+void i2sdacbuiltin_dac_on()
+{
+    
     // //for internal DAC, this will enable both of the internal channels
     // i2s_set_pin(I2SDAC_I2S_NUMBER, NULL);
 
@@ -34,12 +47,10 @@ void i2sdacbuiltin_init()
     i2s_set_dac_mode(I2S_DAC_CHANNEL_RIGHT_EN);
 }
 
-void i2sdacbuiltin_deinit()
+void i2sdacbuiltin_dac_off()
 {
-    // Uninstall i2s driver
-    i2s_driver_uninstall(I2SDAC_I2S_NUMBER);
+    i2s_set_dac_mode(I2S_DAC_CHANNEL_DISABLE);
 }
-
 
 size_t i2sdacbuiltin_write_sample(int16_t sample)
 {
@@ -100,4 +111,98 @@ void i2sdacbuiltin_tone(int16_t tone, int32_t msec)
             i2sdacbuiltin_write_sample(toneSamples[i]);
         }
     }
+}
+
+typedef struct  {
+  int16_t tone;
+  int32_t msec;
+} queueparam_t;
+
+QueueHandle_t queueHandle = NULL;   // (queueparam_t)
+TaskHandle_t taskHandle = NULL;
+
+typedef enum {
+    TONE_OFF,
+    TONE_PLAY,
+    TONE_PAUSE
+} tonestate_t;
+
+tonestate_t tonestate=TONE_OFF;
+
+void i2sdacbuiltin_task(void *param)
+{
+    const TickType_t xTicksToWait = 1000/portTICK_PERIOD_MS;
+    
+    while (1)
+    {
+        queueparam_t param;
+        BaseType_t ret = xQueueReceive(queueHandle, &param, xTicksToWait);
+        if (ret==pdPASS)
+        {
+            if (tonestate==TONE_OFF)
+            {
+                i2sdacbuiltin_dac_on();
+                i2sdacbuiltin_start();
+                tonestate=TONE_PLAY;
+            }
+            else if (tonestate==TONE_PAUSE)
+            {
+                i2sdacbuiltin_start();
+                tonestate=TONE_PLAY;
+            }
+            i2sdacbuiltin_tone(param.tone, param.msec);
+            if (uxQueueMessagesWaiting(queueHandle)>0)
+            {
+                //next
+            }
+            else
+            {
+                i2sdacbuiltin_stop();
+                tonestate=TONE_PAUSE;
+            }
+        }
+        else
+        {
+            if(tonestate==TONE_PAUSE)
+            {
+                i2sdacbuiltin_dac_off();
+                tonestate=TONE_OFF;
+            }
+        }
+    }
+}
+
+void i2sdacbuiltin_task_init()
+{
+    if (taskHandle)
+    {
+        return;
+    }
+    i2sdacbuiltin_init();
+    tonestate=TONE_OFF;
+    queueHandle = xQueueCreate(5, sizeof(queueparam_t));
+    xTaskCreate(i2sdacbuiltin_task, "i2sdacbuiltin_task", 1024 * 2, NULL, 5, &taskHandle);
+}
+
+void i2sdacbuiltin_task_deint()
+{
+    if (taskHandle)
+    {
+        vTaskDelete(taskHandle);
+        taskHandle=NULL;
+        i2sdacbuiltin_deinit();
+    }
+}
+
+void i2sdacbuiltin_task_tone(int16_t tone, int32_t msec)
+{
+    if (!taskHandle)
+    {
+        i2sdacbuiltin_task_init();
+    }
+    
+    queueparam_t param;
+    param.tone=tone;
+    param.msec=msec;
+    xQueueSend(queueHandle, &param, 0);
 }

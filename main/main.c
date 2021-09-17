@@ -69,7 +69,8 @@ void app_main(void)
             (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
     
     init_gpio_input();
-    i2sdacbuiltin_init();
+    //i2sdacbuiltin_init();
+    i2sdacbuiltin_task_init();
     int64_t nextTime = (esp_timer_get_time()/1000000)*1000000 + 1000000;
     int count = 0;
     for (;;) {
@@ -77,34 +78,41 @@ void app_main(void)
         printf("Starting in %d seconds...\n", countdown);
         if (countdown==COUNTDOWN_30)
         {
-            i2sdacbuiltin_start();
-            i2sdacbuiltin_tone(880, 250);   // A5 ラ5
-            i2sdacbuiltin_tone(1760, 250);  // A6 ラ6
-            i2sdacbuiltin_stop();    
+            // i2sdacbuiltin_start();
+            // i2sdacbuiltin_tone(880, 250);   // A5 ラ5
+            // i2sdacbuiltin_tone(1760, 250);  // A6 ラ6
+            // i2sdacbuiltin_stop();    
+            
+            i2sdacbuiltin_task_tone(880, 250);   // A5 ラ5
+            i2sdacbuiltin_task_tone(1760, 250);  // A6 ラ6
         }
         else if (countdown==COUNTDOWN_20)
         {
-            i2sdacbuiltin_start();
-            i2sdacbuiltin_tone(880, 250);   // A5 ラ5
-            i2sdacbuiltin_stop();    
+            // i2sdacbuiltin_start();
+            // i2sdacbuiltin_tone(880, 250);   // A5 ラ5
+            // i2sdacbuiltin_stop();    
+            i2sdacbuiltin_task_tone(880, 250);   // A5 ラ5
         }
         else if (countdown==COUNTDOWN_10)
         {
-            i2sdacbuiltin_start();
-            i2sdacbuiltin_tone(880, 500);   // A5 ラ5
-            i2sdacbuiltin_stop();
+            // i2sdacbuiltin_start();
+            // i2sdacbuiltin_tone(880, 500);   // A5 ラ5
+            // i2sdacbuiltin_stop();
+            i2sdacbuiltin_task_tone(880, 500);   // A5 ラ5
         }
         else if (countdown<=COUNTDOWN_05 && countdown>COUNTDOWN_00)
         {
-            i2sdacbuiltin_start();
-            i2sdacbuiltin_tone(880, 250);   // A5 ラ5
-            i2sdacbuiltin_stop();
+            // i2sdacbuiltin_start();
+            // i2sdacbuiltin_tone(880, 250);   // A5 ラ5
+            // i2sdacbuiltin_stop();
+            i2sdacbuiltin_task_tone(880, 250);   // A5 ラ5
         }
         else if (countdown==COUNTDOWN_00)
         {
-            i2sdacbuiltin_start();
-            i2sdacbuiltin_tone(1760, 750);   // A6 ラ6
-            i2sdacbuiltin_stop();
+            // i2sdacbuiltin_start();
+            // i2sdacbuiltin_tone(1760, 750);   // A6 ラ6
+            // i2sdacbuiltin_stop();
+            i2sdacbuiltin_task_tone(1760, 750);   // A6 ラ6
         }
         int64_t delay = (nextTime - esp_timer_get_time()) / (1000 * portTICK_PERIOD_MS);
         if (delay<0)

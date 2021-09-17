@@ -1,6 +1,7 @@
 {
   "C_Cpp.intelliSenseEngine": "Tag Parser",
   "files.associations": {
-    "cstddef": "c"
+    "cstddef": "c",
+    "i2sdacbuiltintone.h": "c"
   }
 }

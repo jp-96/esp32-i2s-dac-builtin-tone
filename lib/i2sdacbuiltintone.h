@@ -20,8 +20,15 @@
 void i2sdacbuiltin_init();
 void i2sdacbuiltin_deinit();
 size_t i2sdacbuiltin_write_sample(int16_t sample);
+void i2sdacbuiltin_dac_on();
+void i2sdacbuiltin_dac_off();
 void i2sdacbuiltin_start();
 void i2sdacbuiltin_stop();
 void i2sdacbuiltin_tone(int16_t tone, int32_t msec);
+
+void i2sdacbuiltin_task(void *params);
+void i2sdacbuiltin_task_init();
+void i2sdacbuiltin_task_deint();
+void i2sdacbuiltin_task_tone(int16_t tone, int32_t msec);
 
 #endif // #ifndef I2SDACBUILTINTONE_H
