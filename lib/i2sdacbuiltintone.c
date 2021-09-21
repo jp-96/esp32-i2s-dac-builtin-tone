@@ -131,7 +131,7 @@ tonestate_t tonestate=TONE_OFF;
 
 void i2sdacbuiltin_task(void *param)
 {
-    const TickType_t xTicksToWait = 1000/portTICK_PERIOD_MS;
+    const TickType_t xTicksToWait = 2000/portTICK_PERIOD_MS;
     
     while (1)
     {
@@ -184,7 +184,7 @@ void i2sdacbuiltin_task_init()
     xTaskCreate(i2sdacbuiltin_task, "i2sdacbuiltin_task", 1024 * 2, NULL, 5, &taskHandle);
 }
 
-void i2sdacbuiltin_task_deint()
+void i2sdacbuiltin_task_deinit()
 {
     if (taskHandle)
     {

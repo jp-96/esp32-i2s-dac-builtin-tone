@@ -28,7 +28,7 @@ void i2sdacbuiltin_tone(int16_t tone, int32_t msec);
 
 void i2sdacbuiltin_task(void *params);
 void i2sdacbuiltin_task_init();
-void i2sdacbuiltin_task_deint();
+void i2sdacbuiltin_task_deinit();
 void i2sdacbuiltin_task_tone(int16_t tone, int32_t msec);
 
 #endif // #ifndef I2SDACBUILTINTONE_H
