@@ -84,3 +84,15 @@ cd vscode-env-remote-esp-idf/ws/micropython/ports/esp32/build-GENERIC
 esptool.py --port COM3 erase_flash
 esptool.py --chip esp32 --port COM3 write_flash -z 0x1000 firmware.bin
 ```
+
+### スタート練習装置のサンプル
+
+`esp32-i2s-dac-builtin-tone/example`フォルダにトーンを使ったスタート練習装置のサンプルプログラムがあります。
+`ampy`ツール等でESP32へpyファイルを書き込んでください。
+
+```
+cd yourworkfolder
+cd vscode-env-remote-esp-idf/ws/esp32-i2s-dac-builtin-tone/example
+ampy -p COM3 put intervalstarter.py
+ampy -p COM3 put main.py
+```
